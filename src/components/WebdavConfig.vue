@@ -1,7 +1,7 @@
 <template>
   <n-modal :show="showWebdavConfig">
     <n-card
-      style="width: 600px"
+      style="width: 500px"
       title="连接存储后端"
       :bordered="false"
       size="huge"

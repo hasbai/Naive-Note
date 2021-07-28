@@ -8,7 +8,11 @@
       >
       <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
         <n-layout-sider bordered content-style="padding: 24px;">
-          <FileSelector></FileSelector>
+          <!-- <n-button>打开文件夹</n-button> -->
+          <FileSelector
+            :default-data="defaultData"
+            :default-expanded-items="defaultExpandedItems"
+          ></FileSelector>
         </n-layout-sider>
         <n-layout content-style="padding: 24px;">
           <n-space vertical>
@@ -39,7 +43,10 @@ export default {
   components: { FileSelector, WebdavConfig },
 
   data() {
-    return {}
+    return {
+      defaultData: [{ label: '/', key: '/', isLeaf: false }],
+      defaultExpandedItems: ['/'],
+    }
   },
 
   methods: {},

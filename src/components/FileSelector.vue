@@ -3,9 +3,11 @@
     <n-h2>file selector</n-h2>
     <n-tree
       block-line
-      selectable
       :data="data"
-      v-model:selected-keys="selectedItem"
+      v-model:expanded-keys="expandedItems"
+      selectable
+      @update:selected-keys="emitSelectedKeys"
+      @update:expanded-keys="emitExpandedKeys"
       remote
       :on-load="handleLoad"
       style="text-align: left"
@@ -26,10 +28,14 @@ import {
 export default {
   name: 'FileSelector',
   components: {},
+  props: {
+    defaultData: Array, // [{ label: '/', key: '/', isLeaf: false }] 详见 naive-ui 文档----树节点
+    defaultExpandedItems: Array, // 数组元素为树节点的 key(文件的绝对路径)
+  },
   data() {
     return {
-      data: [{ label: '/', key: '/', isLeaf: false }],
-      selectedItem: [],
+      data: [],
+      expandedItems: [],
     }
   },
   computed: {
@@ -58,10 +64,26 @@ export default {
           label: item.basename,
           key: item.filename,
           isLeaf: item.type === 'directory' ? false : true,
-          prefix: () => h(NIcon, {}, { default: () => h(icon) }),
+          prefix: () => h(NIcon, {}, { default: () => h(icon) }), // 渲染图标, 插槽使用函数表达以提高性能
         }
       })
     },
+    emitSelectedKeys(keys) {
+      this.$emit('on-select', keys)
+    },
+    emitExpandedKeys(keys) {
+      this.$emit('on-expand', keys)
+    },
+  },
+  created() {
+    this.data = this.defaultData
+    // 自动加载默认展开项
+    this.data.forEach(async (node) => {
+      if (this.defaultExpandedItems.includes(node.key)) {
+        await this.handleLoad(node)
+        this.expandedItems.push(node.key)
+      }
+    })
   },
 }
 </script>
