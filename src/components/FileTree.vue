@@ -1,22 +1,20 @@
 <template>
   <div>
-    <n-h2>file selector</n-h2>
     <n-tree
       block-line
-      :data="data"
-      v-model:expanded-keys="expandedItems"
       selectable
-      @update:selected-keys="emitSelectedKeys"
-      @update:expanded-keys="emitExpandedKeys"
+      :data="data"
+      @update:selected-keys="handleSelectedKeys"
+      @update:expanded-keys="handleExpandedKeys"
       remote
       :on-load="handleLoad"
-      style="text-align: left"
+      style="text-align: left; padding: 12px 0px"
     />
   </div>
 </template>
 
 <script>
-import { h } from 'vue'
+import { h, toRaw } from 'vue'
 import { NIcon } from 'naive-ui'
 import { LogoMarkdown } from '@vicons/ionicons5'
 import {
@@ -26,26 +24,30 @@ import {
   FileTextOutlined,
 } from '@vicons/antd'
 export default {
-  name: 'FileSelector',
+  name: 'FileTree',
   components: {},
   props: {
-    defaultData: Array, // [{ label: '/', key: '/', isLeaf: false }] 详见 naive-ui 文档----树节点
-    defaultExpandedItems: Array, // 数组元素为树节点的 key(文件的绝对路径)
+    inputData: Array, // Array<TreeNode>
   },
   data() {
     return {
       data: [],
-      expandedItems: [],
     }
   },
   computed: {
     client() {
-      return this.$store.state.client
+      return this.$store.getters.client
+    },
+  },
+  watch: {
+    inputData() {
+      this.data = this.inputData
     },
   },
   methods: {
     async handleLoad(node) {
       let Items = await this.client.getDirectoryContents(node.key)
+      console.log('get directory contents ......')
       console.log(Items)
       node.children = Items.map((item) => {
         let icon
@@ -67,23 +69,37 @@ export default {
           prefix: () => h(NIcon, {}, { default: () => h(icon) }), // 渲染图标, 插槽使用函数表达以提高性能
         }
       })
+      return node
     },
-    emitSelectedKeys(keys) {
-      this.$emit('on-select', keys)
+    recursiveSearch(array, key) {
+      for (let i = 0; i < array.length; i++) {
+        if (array[i].key === key) {
+          return array[i]
+        }
+        if (
+          array[i].children instanceof Array &&
+          array[i].children.length > 0
+        ) {
+          return this.recursiveSearch(array[i].children, key)
+        }
+      }
     },
-    emitExpandedKeys(keys) {
+    handleSelectedKeys(keys) {
+      // 返回 Array<树结点>
+      const nodes = keys.map((key) => {
+        return this.recursiveSearch(toRaw(this.data), key) // data是 Proxy 对象,将其转换为原始对象
+      })
+      console.log('selected folder')
+      console.log(nodes)
+      this.$emit('on-select', nodes)
+    },
+    handleExpandedKeys(keys) {
+      // 返回 Array<树节点的 key>
       this.$emit('on-expand', keys)
     },
   },
   created() {
-    this.data = this.defaultData
-    // 自动加载默认展开项
-    this.data.forEach(async (node) => {
-      if (this.defaultExpandedItems.includes(node.key)) {
-        await this.handleLoad(node)
-        this.expandedItems.push(node.key)
-      }
-    })
+    this.data = this.inputData
   },
 }
 </script>
