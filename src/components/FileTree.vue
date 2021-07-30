@@ -92,8 +92,6 @@ export default {
       const nodes = keys.map((key) => {
         return this.recursiveSearch(toRaw(this.data), key) // data是 Proxy 对象,将其转换为原始对象
       })
-      console.log('selected folder')
-      console.log(nodes)
       this.$emit('on-select', nodes)
     },
     handleExpandedKeys(keys) {
