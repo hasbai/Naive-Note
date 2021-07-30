@@ -8,11 +8,12 @@
       @update:expanded-keys="handleExpandedKeys"
       remote
       :on-load="handleLoad"
-      style="text-align: left; padding: 12px 0px"
+      style="text-align: left; padding: 12px 0"
     />
   </div>
 </template>
 
+<!--suppress JSUnusedGlobalSymbols -->
 <script>
 import { h, toRaw } from 'vue'
 import { NIcon } from 'naive-ui'
@@ -47,8 +48,6 @@ export default {
   methods: {
     async handleLoad(node) {
       let Items = await this.client.getDirectoryContents(node.key)
-      console.log('get directory contents ......')
-      console.log(Items)
       node.children = Items.map((item) => {
         let icon
         if (item.type === 'directory') {
@@ -65,7 +64,7 @@ export default {
         return {
           label: item.basename,
           key: item.filename,
-          isLeaf: item.type === 'directory' ? false : true,
+          isLeaf: item.type !== 'directory',
           prefix: () => h(NIcon, {}, { default: () => h(icon) }), // 渲染图标, 插槽使用函数表达以提高性能
         }
       })
@@ -80,9 +79,13 @@ export default {
           array[i].children instanceof Array &&
           array[i].children.length > 0
         ) {
-          return this.recursiveSearch(array[i].children, key)
+          const result = this.recursiveSearch(array[i].children, key)
+          if (result) {
+            return result
+          }
         }
       }
+      return undefined
     },
     handleSelectedKeys(keys) {
       // 返回 Array<树结点>
