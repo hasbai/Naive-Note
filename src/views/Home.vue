@@ -3,10 +3,12 @@
     <WebdavConfig></WebdavConfig>
     <FolderSelector></FolderSelector>
     <n-layout position="absolute">
+      <!-- 页首 -->
       <n-layout-header style="height: 64px; padding: 24px" bordered
         >header</n-layout-header
       >
       <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
+        <!-- 侧边栏 -->
         <n-layout-sider bordered content-style="padding: 16px 24px;">
           <n-button
             style="width: 100%"
@@ -19,14 +21,16 @@
             </template>
             打开文件夹
           </n-button>
-          <FileTree :input-data="folders"></FileTree>
+          <FileTree :input-data="folders" @on-select="handleSelect"></FileTree>
         </n-layout-sider>
+        <!-- 主体 -->
         <n-layout content-style="padding: 24px;">
           <n-space vertical>
-            <div>editor</div>
+            <Tab ref="editor"></Tab>
           </n-space>
         </n-layout>
       </n-layout>
+      <!-- 页尾 -->
       <n-layout-footer
         bordered
         position="absolute"
@@ -41,20 +45,40 @@
 <script>
 // @ is an alias to /src
 import { FolderOpenFilled as FolderIcon } from '@vicons/antd'
-import { toRaw } from 'vue'
+import { useMessage } from 'naive-ui'
 import FileTree from '@/components/FileTree.vue'
 import WebdavConfig from '@/components/WebdavConfig.vue'
 import FolderSelector from '@/components/FolderSelector.vue'
+import Tab from '@/components/Tab.vue'
 export default {
   name: 'Home',
 
-  components: { FileTree, WebdavConfig, FolderSelector, FolderIcon },
+  components: { FileTree, WebdavConfig, FolderSelector, Tab, FolderIcon },
 
   data() {
     return {}
   },
 
-  methods: {},
+  methods: {
+    handleSelect(nodes) {
+      // 剔除非叶子节点(即文件夹)
+      for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].isLeaf === false) {
+          this.message.warning('选择的' + nodes[i].label + '不是文件')
+          nodes.splice(i, 1)
+        }
+      }
+      // 校验数组非空
+      if (nodes.length === 0) {
+        this.message.error('未选择文件')
+        return false
+      }
+      // 添加文件
+      nodes.forEach((node) => {
+        this.$refs.editor.add(node)
+      })
+    },
+  },
 
   computed: {
     folders() {
@@ -71,7 +95,7 @@ export default {
 
   created() {
     const that = this
-
+    this.message = useMessage()
     // 设置 webdav
     async function configWebdav() {
       if (Object.keys(that.$store.state.webdavConfig).length > 0) {
