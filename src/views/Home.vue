@@ -5,7 +5,7 @@
     <n-layout position="absolute">
       <!-- 页首 -->
       <n-layout-header style="height: 64px; padding: 24px" bordered
-        >header</n-layout-header
+        >Naive Note</n-layout-header
       >
       <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
         <!-- 侧边栏 -->
@@ -24,11 +24,11 @@
           <FileTree :input-data="folders" @on-select="handleSelect"></FileTree>
         </n-layout-sider>
         <!-- 主体 -->
-        <n-layout content-style="padding: 24px;">
-          <n-space vertical>
-            <Tab ref="editor"></Tab>
-          </n-space>
-        </n-layout>
+        <n-layout-content
+          content-style="padding: 0; text-align: left; height: 100%"
+        >
+          <Tab ref="tab"></Tab>
+        </n-layout-content>
       </n-layout>
       <!-- 页尾 -->
       <n-layout-footer
@@ -36,7 +36,7 @@
         position="absolute"
         style="height: 64px; padding: 24px"
       >
-        footer
+        &copy; 2017 - {{ new Date().getFullYear() }} Shi
       </n-layout-footer>
     </n-layout>
   </div>
@@ -75,7 +75,7 @@ export default {
       }
       // 添加文件
       nodes.forEach((node) => {
-        this.$refs.editor.add(node)
+        this.$refs.tab.add(node)
       })
     },
   },
