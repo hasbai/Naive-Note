@@ -1,32 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-// import NotFound from '@/views/NotFound.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import('@/views/Home.vue'),
+    children: [
+      { path: '', name: 'Home', component: () => import('@/views/Home.vue') },
+      { path: 'editor', component: () => import('@/components/Editor.vue') },
+    ],
   },
   {
     path: '/about',
     name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    component: () => import('@/views/About.vue'),
   },
-  // {
-  //   path: '*',
-  //   name: 'Not Found',
-  //   component: NotFound,
-  // }
+  {
+    path: '/:pathMatch(.*)',
+    name: '404',
+    component: () => import('@/views/404.vue'),
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 })
+
+// router.beforeEach((to, from, next) => {
+//   if (to.path === '/') {
+//     next({ name: 'Home' })
+//   } else next()
+// })
 
 export default router
