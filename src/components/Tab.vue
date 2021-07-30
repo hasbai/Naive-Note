@@ -1,63 +1,61 @@
 <template>
-  <n-tabs
-    v-model:value="viewingTab"
-    type="card"
-    closable
-    @close="close"
-    tab-style="min-width: 80px;"
-  >
-    <n-tab-pane
-      v-for="file in files"
-      :key="file.path"
-      :tab="file.name"
-      :name="file.path"
+  <div class="tab-container">
+    <n-tabs
+      v-model:value="viewingKey"
+      type="card"
+      closable
+      @close="close"
+      tab-style="min-width: 80px"
     >
-      {{ file.content }}
-      <!-- <div :id="this.contentName"></div> -->
-    </n-tab-pane>
-  </n-tabs>
+      <n-tab-pane
+        v-for="file in files"
+        :key="file.key"
+        :tab="file.label"
+        :name="file.key"
+        style="padding: 0"
+      >
+      </n-tab-pane>
+    </n-tabs>
+    <keep-alive>
+      <Editor v-if="viewingKey" :key="viewingKey" :path="viewingKey"></Editor>
+    </keep-alive>
+  </div>
 </template>
 
 <script>
 import { useMessage } from 'naive-ui'
-// import Vditor from 'vditor'
-// import 'vditor/dist/index.css'
+import Editor from '@/components/Editor.vue'
 export default {
-  name: 'Editor',
+  name: 'Tab',
+  components: { Editor },
   data() {
     return {
-      files: [], // Array<File> File: {name: node.label, path: node.key, content: content}
-      viewingTab: '', // file.path
+      // Array<File> File: {name: file.label, key: file.key}
+      files: [],
+      viewingKey: '', // file.key
     }
   },
   computed: {
-    client() {
-      return this.$store.getters.client
+    currentFile() {
+      const index = this.files.findIndex((file) => this.viewingKey === file.key)
+      return index === -1 ? {} : this.files[index]
     },
   },
   methods: {
     close(key) {
-      const index = this.files.findIndex((file) => key === file.path)
+      const index = this.files.findIndex((file) => key === file.key)
       if (this.files.length === 1) {
-        this.viewingTab = ''
+        this.viewingKey = ''
       } else if (index === this.files.length - 1) {
-        this.viewingTab = this.files[index - 1].path
+        this.viewingKey = this.files[index - 1].key
       } else {
-        this.viewingTab = this.files[index + 1].path
+        this.viewingKey = this.files[index + 1].key
       }
       this.files.splice(index, 1)
     },
-    async add(node) {
-      const content = await this.client.getFileContents(node.key, {
-        format: 'text',
-      })
-      const file = {
-        name: node.label,
-        path: node.key,
-        content: content,
-      }
-      this.files.push(file)
-      this.viewingTab = file.path
+    add(node) {
+      this.files.push(node)
+      this.viewingKey = node.key
     },
   },
   created() {
@@ -66,4 +64,10 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.tab-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+</style>
