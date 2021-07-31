@@ -1,10 +1,28 @@
 <template>
-  <n-message-provider>
-    <router-view></router-view>
-  </n-message-provider>
+  <div position="relative">
+    <n-layout position="absolute">
+      <!-- 页首 -->
+      <n-layout-header class="footer" bordered>Naive Note</n-layout-header>
+
+      <!--主体-->
+      <n-message-provider>
+        <router-view></router-view>
+      </n-message-provider>
+
+      <!-- 页尾 -->
+      <n-layout-footer bordered position="absolute" class="footer">
+        &copy; 2017 - {{ new Date().getFullYear() }} Shi
+      </n-layout-footer>
+    </n-layout>
+  </div>
 </template>
 
 <style>
+.footer {
+  height: 64px;
+  padding: 24px;
+}
+
 /*noinspection CssUnusedSymbol*/
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

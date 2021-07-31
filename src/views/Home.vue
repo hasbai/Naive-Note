@@ -1,45 +1,28 @@
 <template>
-  <div position="relative">
-    <WebdavConfig></WebdavConfig>
-    <FolderSelector></FolderSelector>
-    <n-layout position="absolute">
-      <!-- 页首 -->
-      <n-layout-header style="height: 64px; padding: 24px" bordered
-        >Naive Note</n-layout-header
+  <WebdavConfig></WebdavConfig>
+  <FolderSelector></FolderSelector>
+
+  <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
+    <!-- 侧边栏 -->
+    <n-layout-sider bordered content-style="padding: 16px 24px;">
+      <n-button
+        style="width: 100%"
+        @click="this.$store.commit('displayFolderSelector')"
       >
-      <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
-        <!-- 侧边栏 -->
-        <n-layout-sider bordered content-style="padding: 16px 24px;">
-          <n-button
-            style="width: 100%"
-            @click="this.$store.commit('displayFolderSelector')"
-          >
-            <template #icon>
-              <n-icon>
-                <folder-icon />
-              </n-icon>
-            </template>
-            打开文件夹
-          </n-button>
-          <FileTree :input-data="folders" @on-select="handleSelect"></FileTree>
-        </n-layout-sider>
-        <!-- 主体 -->
-        <n-layout-content
-          content-style="padding: 0; text-align: left; height: 100%"
-        >
-          <Tab ref="tab"></Tab>
-        </n-layout-content>
-      </n-layout>
-      <!-- 页尾 -->
-      <n-layout-footer
-        bordered
-        position="absolute"
-        style="height: 64px; padding: 24px"
-      >
-        &copy; 2017 - {{ new Date().getFullYear() }} Shi
-      </n-layout-footer>
-    </n-layout>
-  </div>
+        <n-icon>
+          <folder-icon />
+        </n-icon>
+        打开文件夹
+      </n-button>
+      <FileTree :input-data="folders" @on-select="handleSelect"></FileTree>
+    </n-layout-sider>
+    <!-- 内容 -->
+    <n-layout-content
+      content-style="padding: 0; text-align: left; height: 100%"
+    >
+      <Tab ref="tab"></Tab>
+    </n-layout-content>
+  </n-layout>
 </template>
 
 <script>
