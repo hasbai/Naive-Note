@@ -11,6 +11,7 @@
   >
     <FileTree
       :input-data="[{ label: '/', key: '/', isLeaf: false }]"
+      :multiple="true"
       @on-select="handleSelect"
     ></FileTree>
     <n-row :gutter="[0, 24]">

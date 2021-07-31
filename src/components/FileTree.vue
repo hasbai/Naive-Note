@@ -2,8 +2,10 @@
   <div>
     <n-tree
       block-line
-      selectable
       :data="data"
+      selectable
+      :multiple="multiple"
+      :selected-keys="selectedKeys"
       @update:selected-keys="handleSelectedKeys"
       @update:expanded-keys="handleExpandedKeys"
       remote
@@ -29,10 +31,15 @@ export default {
   components: {},
   props: {
     inputData: Array, // Array<TreeNode>
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       data: [],
+      selectedKeys: [],
     }
   },
   computed: {
@@ -88,11 +95,17 @@ export default {
       return undefined
     },
     handleSelectedKeys(keys) {
-      // 返回 Array<树结点>
+      console.log(keys)
+      this.selectedKeys = keys
+      // emit 事件
       const nodes = keys.map((key) => {
         return this.recursiveSearch(toRaw(this.data), key) // data是 Proxy 对象,将其转换为原始对象
       })
-      this.$emit('on-select', nodes)
+      this.$emit('on-select', nodes) // 返回 Array<树结点>
+      // 单选模式下不保存已选择的节点
+      if (!this.multiple) {
+        this.selectedKeys = []
+      }
     },
     handleExpandedKeys(keys) {
       // 返回 Array<树节点的 key>
