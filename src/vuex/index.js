@@ -1,6 +1,9 @@
 import { createStore } from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import { createClient } from 'webdav'
+import { h } from 'vue'
+import { NIcon } from 'naive-ui'
+import { FolderOpenFilled } from '@vicons/antd'
 
 const store = createStore({
   plugins: [
@@ -25,15 +28,16 @@ const store = createStore({
         password: webdavConfig.password,
       })
     },
-    // folders(state) {
-    //   return state.folders.map(node => {
-    //     return {
-    //       label: node.label,
-    //       key: node.key,
-    //       prefix
-    //     }
-    //   })
-    // }
+    folders(state) {
+      return state.folders.map((node) => {
+        return {
+          label: node.label,
+          key: node.key,
+          isLeaf: false,
+          prefix: () => h(NIcon, {}, { default: () => h(FolderOpenFilled) }),
+        }
+      })
+    },
   },
   mutations: {
     setWebdavConfig(state, config) {
