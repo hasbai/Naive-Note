@@ -5,7 +5,7 @@
 <script>
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
-import { useMessage, useDialog } from 'naive-ui'
+import { useMessage, useDialog, useLoadingBar } from 'naive-ui'
 export default {
   name: 'Editor',
   props: { path: String },
@@ -42,27 +42,31 @@ export default {
     },
     async updateContent() {
       try {
+        this.loadingBar.start()
         const content = await this.client.getFileContents(this.path, {
           format: 'text',
         })
-        this.message.success('文件已加载')
+        this.loadingBar.finish()
         this.editor.setValue(content)
         this.remoteContent = content
       } catch (e) {
         console.log(e)
+        this.loadingBar.error()
         this.message.error('文件加载失败' + e)
       }
     },
 
     async save() {
+      this.loadingBar.start()
       const content = this.editor.getValue()
       const result = await this.client.putFileContents(this.path, content, {
         contentLength: false,
       })
       if (result === true) {
-        this.message.success('保存成功')
+        this.loadingBar.finish()
         this.remoteContent = content
       } else {
+        this.loadingBar.error()
         this.message.error('保存失败')
       }
     },
@@ -136,6 +140,7 @@ export default {
   created() {
     this.message = useMessage()
     this.dialog = useDialog()
+    this.loadingBar = useLoadingBar()
     this.onUpdate()
     setInterval(() => {
       // 加载完后再判断
