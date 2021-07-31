@@ -12,6 +12,8 @@ export default {
   data() {
     return {
       editor: undefined,
+      remoteContent: '',
+      unsaved: false,
     }
   },
   computed: {
@@ -25,6 +27,7 @@ export default {
         format: 'text',
       })
       this.editor.setValue(content)
+      this.remoteContent = content
     },
     async save() {
       const content = this.editor.getValue()
@@ -33,12 +36,20 @@ export default {
       })
       if (result === true) {
         this.message.success('保存成功')
+        this.unsaved = false
       } else {
         this.message.error('保存失败')
       }
     },
   },
-  watch: {},
+  watch: {
+    unsaved() {
+      this.$store.commit('modifyUnsavedFiles', {
+        key: this.path,
+        method: this.unsaved ? 'add' : 'delete',
+      })
+    },
+  },
   mounted() {
     this.editor = new Vditor(this.path, {
       height: '100%',
@@ -94,11 +105,20 @@ export default {
           this.$emit('error', response)
         },
       },
-      after: this.getContent,
+      // after: this.getContent,
     })
   },
   created() {
     this.message = useMessage()
+    const that = this
+    async function setUp() {
+      await that.getContent()
+      setInterval(() => {
+        that.unsaved = !(that.remoteContent === that.editor.getValue())
+      }, 500)
+    }
+
+    setUp()
   },
 }
 </script>

@@ -10,7 +10,7 @@
       <n-tab-pane
         v-for="file in files"
         :key="file.key"
-        :tab="file.label"
+        :tab="unsavedFiles.includes(file.key) ? '● ' + file.label : file.label"
         :name="file.key"
         style="padding: 0"
       >
@@ -40,7 +40,11 @@ export default {
       viewingKey: '', // file.key
     }
   },
-  computed: {},
+  computed: {
+    unsavedFiles() {
+      return this.$store.state.unsavedFiles
+    },
+  },
   methods: {
     findIndex(key) {
       return this.files.findIndex((file) => key === file.key)
