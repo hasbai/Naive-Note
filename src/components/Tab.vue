@@ -47,6 +47,7 @@ export default {
   },
   methods: {
     findIndex(key) {
+      // 对象数组不能用 includes 判断
       return this.files.findIndex((file) => key === file.key)
     },
     close(key) {
@@ -61,17 +62,23 @@ export default {
       this.files.splice(index, 1)
     },
     add(node) {
-      if (this.findIndex(node.key) === -1) {
+      const isOpened = this.findIndex(node.key) >= 0
+      const isCached = this.cachedEditors.includes(node.key)
+      // 打开标签页
+      if (!isOpened) {
         this.files.push(node)
       }
-      this.viewingKey = node.key // 切换至（如没有则创建）编辑器
-      // 如果编辑器已渲染，再次点击则更新内容
-      if (this.cachedEditors.includes(node.key)) {
+      // 缓存编辑器
+      if (!isCached) {
+        this.cachedEditors.push(node.key)
+      }
+      // 切换至（如没有则创建）编辑器
+      this.viewingKey = node.key
+      // 如果编辑器已缓存且标签页已打开，再次点击则更新内容
+      if (isOpened && isCached) {
         this.$nextTick(() => {
           this.$refs.editor.onUpdate()
         })
-      } else {
-        this.cachedEditors.push(node.key)
       }
     },
   },
