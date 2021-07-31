@@ -1,19 +1,21 @@
 <template>
   <div position="relative">
-    <n-layout position="absolute">
-      <!-- 页首 -->
-      <n-layout-header class="footer" bordered>Naive Note</n-layout-header>
-
-      <!--主体-->
+    <n-dialog-provider>
       <n-message-provider>
-        <router-view></router-view>
-      </n-message-provider>
+        <n-layout position="absolute">
+          <!-- 页首 -->
+          <n-layout-header class="footer" bordered>Naive Note</n-layout-header>
 
-      <!-- 页尾 -->
-      <n-layout-footer bordered position="absolute" class="footer">
-        &copy; 2017 - {{ new Date().getFullYear() }} Shi
-      </n-layout-footer>
-    </n-layout>
+          <!--主体-->
+          <router-view></router-view>
+
+          <!-- 页尾 -->
+          <n-layout-footer bordered position="absolute" class="footer">
+            &copy; 2017 - {{ new Date().getFullYear() }} Shi
+          </n-layout-footer>
+        </n-layout>
+      </n-message-provider>
+    </n-dialog-provider>
   </div>
 </template>
 

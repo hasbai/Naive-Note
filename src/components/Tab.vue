@@ -68,7 +68,7 @@ export default {
       // 如果编辑器已渲染，再次点击则更新内容
       if (this.cachedEditors.includes(node.key)) {
         this.$nextTick(() => {
-          this.$refs.editor.getContent()
+          this.$refs.editor.onUpdate()
         })
       } else {
         this.cachedEditors.push(node.key)

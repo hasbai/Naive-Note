@@ -5,14 +5,14 @@
 <script>
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
-import { useMessage } from 'naive-ui'
+import { useMessage, useDialog } from 'naive-ui'
 export default {
   name: 'Editor',
   props: { path: String },
   data() {
     return {
       editor: undefined,
-      remoteContent: '',
+      remoteContent: undefined,
       unsaved: false,
     }
   },
@@ -22,13 +22,38 @@ export default {
     },
   },
   methods: {
-    async getContent() {
-      const content = await this.client.getFileContents(this.path, {
-        format: 'text',
-      })
-      this.editor.setValue(content)
-      this.remoteContent = content
+    onUpdate() {
+      if (this.unsaved) {
+        this.dialog.warning({
+          title: '更改未保存',
+          content: '继续操作可能会丢失本地已修改的内容，你确定？',
+          positiveText: '继续',
+          negativeText: '取消',
+          onPositiveClick: () => {
+            this.updateContent()
+          },
+          onNegativeClick: () => {
+            // pass
+          },
+        })
+      } else {
+        this.updateContent()
+      }
     },
+    async updateContent() {
+      try {
+        const content = await this.client.getFileContents(this.path, {
+          format: 'text',
+        })
+        this.message.success('文件已加载')
+        this.editor.setValue(content)
+        this.remoteContent = content
+      } catch (e) {
+        console.log(e)
+        this.message.error('文件加载失败' + e)
+      }
+    },
+
     async save() {
       const content = this.editor.getValue()
       const result = await this.client.putFileContents(this.path, content, {
@@ -36,7 +61,7 @@ export default {
       })
       if (result === true) {
         this.message.success('保存成功')
-        this.unsaved = false
+        this.remoteContent = content
       } else {
         this.message.error('保存失败')
       }
@@ -105,20 +130,19 @@ export default {
           this.$emit('error', response)
         },
       },
-      // after: this.getContent,
+      // after: this.onUpdate,
     })
   },
   created() {
     this.message = useMessage()
-    const that = this
-    async function setUp() {
-      await that.getContent()
-      setInterval(() => {
-        that.unsaved = !(that.remoteContent === that.editor.getValue())
-      }, 500)
-    }
-
-    setUp()
+    this.dialog = useDialog()
+    this.onUpdate()
+    setInterval(() => {
+      // 加载完后再判断
+      if (this.remoteContent !== undefined) {
+        this.unsaved = this.remoteContent !== this.editor.getValue()
+      }
+    }, 250)
   },
 }
 </script>
