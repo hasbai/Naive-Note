@@ -17,7 +17,12 @@
       </n-tab-pane>
     </n-tabs>
     <keep-alive>
-      <Editor v-if="viewingKey" :key="viewingKey" :path="viewingKey"></Editor>
+      <Editor
+        v-if="viewingKey"
+        :key="viewingKey"
+        :path="viewingKey"
+        ref="editor"
+      ></Editor>
     </keep-alive>
   </div>
 </template>
@@ -30,20 +35,18 @@ export default {
   components: { Editor },
   data() {
     return {
-      // Array<File> File: {name: file.label, key: file.key}
-      files: [],
+      files: [], // Array<File> File: {name: file.label, key: file.key}
+      cachedEditors: [], // 所有已渲染的编辑器
       viewingKey: '', // file.key
     }
   },
-  computed: {
-    currentFile() {
-      const index = this.files.findIndex((file) => this.viewingKey === file.key)
-      return index === -1 ? {} : this.files[index]
-    },
-  },
+  computed: {},
   methods: {
+    findIndex(key) {
+      return this.files.findIndex((file) => key === file.key)
+    },
     close(key) {
-      const index = this.files.findIndex((file) => key === file.key)
+      const index = this.findIndex(key)
       if (this.files.length === 1) {
         this.viewingKey = ''
       } else if (index === this.files.length - 1) {
@@ -54,8 +57,18 @@ export default {
       this.files.splice(index, 1)
     },
     add(node) {
-      this.files.push(node)
-      this.viewingKey = node.key
+      if (this.findIndex(node.key) === -1) {
+        this.files.push(node)
+      }
+      this.viewingKey = node.key // 切换至（如没有则创建）编辑器
+      // 如果编辑器已渲染，再次点击则更新内容
+      if (this.cachedEditors.includes(node.key)) {
+        this.$nextTick(() => {
+          this.$refs.editor.getContent()
+        })
+      } else {
+        this.cachedEditors.push(node.key)
+      }
     },
   },
   created() {

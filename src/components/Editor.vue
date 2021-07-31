@@ -12,7 +12,6 @@ export default {
   data() {
     return {
       editor: undefined,
-      content: '',
     }
   },
   computed: {
@@ -21,10 +20,11 @@ export default {
     },
   },
   methods: {
-    async onFileChange() {
-      this.content = await this.client.getFileContents(this.path, {
+    async getContent() {
+      const content = await this.client.getFileContents(this.path, {
         format: 'text',
       })
+      this.editor.setValue(content)
     },
     async save() {
       const content = this.editor.getValue()
@@ -38,14 +38,7 @@ export default {
       }
     },
   },
-  watch: {
-    async path() {
-      await this.onFileChange()
-    },
-    content() {
-      this.editor.setValue(this.content)
-    },
-  },
+  watch: {},
   mounted() {
     this.editor = new Vditor(this.path, {
       height: '100%',
@@ -101,12 +94,11 @@ export default {
           this.$emit('error', response)
         },
       },
-      after: () => {},
+      after: this.getContent,
     })
   },
   created() {
     this.message = useMessage()
-    this.onFileChange()
   },
 }
 </script>
