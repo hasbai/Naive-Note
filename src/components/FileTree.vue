@@ -95,7 +95,6 @@ export default {
       return undefined
     },
     handleSelectedKeys(keys) {
-      console.log(keys)
       this.selectedKeys = keys
       // emit 事件
       const nodes = keys.map((key) => {
