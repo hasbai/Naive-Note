@@ -1,10 +1,11 @@
 <template>
-  <div :id="path" class="tab-content"></div>
+  <div :id="path" class="tab-content" @keydown.ctrl.s.prevent="save"></div>
 </template>
 
 <script>
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
+import { useMessage } from 'naive-ui'
 export default {
   name: 'Editor',
   props: { path: String },
@@ -24,6 +25,17 @@ export default {
       this.content = await this.client.getFileContents(this.path, {
         format: 'text',
       })
+    },
+    async save() {
+      const content = this.editor.getValue()
+      const result = await this.client.putFileContents(this.path, content, {
+        contentLength: false,
+      })
+      if (result === true) {
+        this.message.success('保存成功')
+      } else {
+        this.message.error('保存失败')
+      }
     },
   },
   watch: {
@@ -93,6 +105,7 @@ export default {
     })
   },
   created() {
+    this.message = useMessage()
     this.onFileChange()
   },
 }
