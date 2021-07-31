@@ -9,7 +9,7 @@
         style="width: 100%"
         @click="this.$store.commit('displayFolderSelector')"
       >
-        <n-icon>
+        <n-icon style="padding-right: 0.5rem">
           <folder-icon />
         </n-icon>
         打开文件夹
