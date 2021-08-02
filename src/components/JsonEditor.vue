@@ -1,8 +1,9 @@
 <template>
   <n-modal
-    :show="true"
+    :show="showJsonEditor"
     preset="card"
     closable
+    @close="this.$store.commit('closeConfigDialogue', 'showJsonEditor')"
     style="width: 90%; max-width: 600px"
     title="编辑设置"
     :bordered="false"
@@ -20,7 +21,7 @@ import { useMessage } from 'naive-ui'
 import JSONEditor from 'jsoneditor'
 import 'jsoneditor/dist/jsoneditor.min.css'
 export default {
-  name: 'Config',
+  name: 'JsonEditor',
   components: {},
   data() {
     return {
@@ -28,20 +29,34 @@ export default {
       editor: undefined,
     }
   },
-
+  computed: {
+    showJsonEditor() {
+      return this.$store.state.showJsonEditor
+    },
+  },
+  watch: {
+    async showJsonEditor() {
+      if (this.showJsonEditor === true) {
+        while (!this.$refs.jsonEditor) {
+          await new Promise((r) => setTimeout(r, 50))
+        }
+        this.createEditor()
+      }
+    },
+  },
   methods: {
     saveConfig() {
       localStorage.setItem('vuex', JSON.stringify(this.editor.get()))
       this.message.success('设置成功')
     },
+    createEditor() {
+      const container = this.$refs.jsonEditor
+      const options = {}
+      this.editor = new JSONEditor(container, options)
+      this.editor.set(JSON.parse(localStorage.getItem('vuex')))
+    },
   },
-
-  mounted() {
-    const container = this.$refs.jsonEditor
-    const options = {}
-    this.editor = new JSONEditor(container, options)
-    this.editor.set(JSON.parse(localStorage.getItem('vuex')))
-  },
+  mounted() {},
   created() {
     this.message = useMessage()
   },
