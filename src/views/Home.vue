@@ -1,45 +1,78 @@
 <template>
-  <WebdavConfig></WebdavConfig>
-  <FolderSelector></FolderSelector>
+  <n-layout position="absolute">
+    <!--    配置组件-->
+    <WebdavConfig></WebdavConfig>
+    <FolderSelector></FolderSelector>
+    <Config v-if="showConfig"></Config>
+    <!-- 页首 -->
+    <n-layout-header class="footer container" bordered>
+      <span class="item"></span>
+      <n-h2 class="item">Naive Note</n-h2>
+      <div class="container item">
+        <n-button class="button" text @click="showConfig = true">
+          <n-icon size="20px">
+            <setting-outlined />
+          </n-icon>
+        </n-button>
+      </div>
+    </n-layout-header>
 
-  <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
-    <!-- 侧边栏 -->
-    <n-layout-sider bordered content-style="padding: 16px 24px;">
-      <n-button
-        style="width: 100%"
-        @click="this.$store.commit('displayFolderSelector')"
+    <!--主体-->
+    <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
+      <!-- 侧边栏 -->
+      <n-layout-sider bordered content-style="padding: 16px 24px;">
+        <n-button
+          style="width: 100%"
+          @click="this.$store.commit('displayFolderSelector')"
+        >
+          <n-icon style="padding-right: 0.5rem">
+            <folder-icon />
+          </n-icon>
+          打开文件夹
+        </n-button>
+        <FileTree :input-data="folders" @on-select="handleSelect"></FileTree>
+      </n-layout-sider>
+      <!-- 内容 -->
+      <n-layout-content
+        content-style="padding: 0; text-align: left; height: 100%"
       >
-        <n-icon style="padding-right: 0.5rem">
-          <folder-icon />
-        </n-icon>
-        打开文件夹
-      </n-button>
-      <FileTree :input-data="folders" @on-select="handleSelect"></FileTree>
-    </n-layout-sider>
-    <!-- 内容 -->
-    <n-layout-content
-      content-style="padding: 0; text-align: left; height: 100%"
-    >
-      <Tab ref="tab"></Tab>
-    </n-layout-content>
+        <Tab ref="tab"></Tab>
+      </n-layout-content>
+    </n-layout>
+
+    <!-- 页尾 -->
+    <n-layout-footer bordered position="absolute" class="footer">
+      &copy; 2017 - {{ new Date().getFullYear() }} Shi
+    </n-layout-footer>
   </n-layout>
 </template>
 
 <script>
 // @ is an alias to /src
-import { FolderOpenFilled as FolderIcon } from '@vicons/antd'
+import { FolderOpenFilled as FolderIcon, SettingOutlined } from '@vicons/antd'
 import { useMessage } from 'naive-ui'
 import FileTree from '@/components/FileTree.vue'
+import Config from '@/components/Config.vue'
 import WebdavConfig from '@/components/WebdavConfig.vue'
 import FolderSelector from '@/components/FolderSelector.vue'
 import Tab from '@/components/Tab.vue'
 export default {
   name: 'Home',
 
-  components: { FileTree, WebdavConfig, FolderSelector, Tab, FolderIcon },
+  components: {
+    FileTree,
+    WebdavConfig,
+    FolderSelector,
+    Tab,
+    Config,
+    FolderIcon,
+    SettingOutlined,
+  },
 
   data() {
-    return {}
+    return {
+      showConfig: false,
+    }
   },
 
   methods: {
@@ -117,4 +150,20 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.footer {
+  height: 64px;
+  padding: 24px;
+}
+.container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.item {
+  flex: 1;
+}
+.button {
+  margin-left: auto;
+}
+</style>
