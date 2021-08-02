@@ -18,6 +18,7 @@ const store = createStore({
       unsavedFiles: [],
       showWebdavConfig: false,
       showFolderSelector: false,
+      showJsonEditor: false,
     }
   },
   getters: {
@@ -40,20 +41,14 @@ const store = createStore({
     },
   },
   mutations: {
+    displayConfigDialogue(state, name) {
+      state[name] = true
+    },
+    closeConfigDialogue(state, name) {
+      state[name] = false
+    },
     setWebdavConfig(state, config) {
       state.webdavConfig = config
-    },
-    displayWebdavConfig(state) {
-      state.showWebdavConfig = true
-    },
-    closeWebdavConfig(state) {
-      state.showWebdavConfig = false
-    },
-    displayFolderSelector(state) {
-      state.showFolderSelector = true
-    },
-    closeFolderSelector(state) {
-      state.showFolderSelector = false
     },
     addFolders(state, folders) {
       state.folders.push.apply(state.folders, folders)

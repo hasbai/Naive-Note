@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     close() {
-      this.$store.commit('closeFolderSelector')
+      this.$store.commit('closeConfigDialogue', 'showFolderSelector')
     },
     handleSelect(nodes) {
       this.selectedNodes = nodes
@@ -63,7 +63,7 @@ export default {
       // 添加文件夹
       this.$store.commit('addFolders', this.selectedNodes)
       this.message.success('打开文件夹成功', { duration: 5000 })
-      this.$store.commit('closeFolderSelector')
+      this.$store.commit('closeConfigDialogue', 'showFolderSelector')
     },
   },
   computed: {

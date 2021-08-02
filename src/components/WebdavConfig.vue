@@ -96,7 +96,7 @@ export default {
           details: true,
         })
         this.successInfo()
-        this.$store.commit('closeWebdavConfig')
+        this.$store.commit('closeConfigDialogue', 'showWebdavConfig')
         this.$store.commit('setWebdavConfig', this.model)
       } catch (e) {
         console.log(e)

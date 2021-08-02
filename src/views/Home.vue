@@ -3,13 +3,13 @@
     <!--    配置组件-->
     <WebdavConfig></WebdavConfig>
     <FolderSelector></FolderSelector>
-    <Config v-if="showConfig"></Config>
+    <JsonEditor></JsonEditor>
     <!-- 页首 -->
     <n-layout-header class="footer container" bordered>
       <span class="item"></span>
       <n-h2 class="item">Naive Note</n-h2>
       <div class="container item">
-        <n-button class="button" text @click="showConfig = true">
+        <n-button class="button" text @click="displayJsonEditor">
           <n-icon size="20px">
             <setting-outlined />
           </n-icon>
@@ -21,10 +21,7 @@
     <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
       <!-- 侧边栏 -->
       <n-layout-sider bordered content-style="padding: 16px 24px;">
-        <n-button
-          style="width: 100%"
-          @click="this.$store.commit('displayFolderSelector')"
-        >
+        <n-button style="width: 100%" @click="displayFolderSelector">
           <n-icon style="padding-right: 0.5rem">
             <folder-icon />
           </n-icon>
@@ -52,7 +49,7 @@
 import { FolderOpenFilled as FolderIcon, SettingOutlined } from '@vicons/antd'
 import { useMessage } from 'naive-ui'
 import FileTree from '@/components/FileTree.vue'
-import Config from '@/components/Config.vue'
+import JsonEditor from '@/components/JsonEditor.vue'
 import WebdavConfig from '@/components/WebdavConfig.vue'
 import FolderSelector from '@/components/FolderSelector.vue'
 import Tab from '@/components/Tab.vue'
@@ -64,18 +61,22 @@ export default {
     WebdavConfig,
     FolderSelector,
     Tab,
-    Config,
+    JsonEditor,
     FolderIcon,
     SettingOutlined,
   },
 
   data() {
-    return {
-      showConfig: false,
-    }
+    return {}
   },
 
   methods: {
+    displayJsonEditor() {
+      this.$store.commit('displayConfigDialogue', 'showJsonEditor')
+    },
+    displayFolderSelector() {
+      this.$store.commit('displayConfigDialogue', 'showFolderSelector')
+    },
     handleSelect(nodes) {
       // 剔除非叶子节点(即文件夹)
       for (let i = 0; i < nodes.length; i++) {
@@ -105,6 +106,9 @@ export default {
     },
     showFolderSelector() {
       return this.$store.state.showFolderSelector
+    },
+    showJsonEditor() {
+      return this.$store.state.showJsonEditor
     },
   },
   watch: {},
