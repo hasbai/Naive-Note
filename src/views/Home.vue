@@ -81,13 +81,13 @@ export default {
       // 剔除非叶子节点(即文件夹)
       for (let i = 0; i < nodes.length; i++) {
         if (nodes[i].isLeaf === false) {
-          this.message.warning('选择的' + nodes[i].label + '不是文件')
+          // this.message.warning('选择的' + nodes[i].label + '不是文件')
           nodes.splice(i, 1)
         }
       }
       // 校验数组非空
       if (nodes.length === 0) {
-        this.message.error('未选择文件')
+        // this.message.error('未选择文件')
         return false
       }
       // 添加文件
