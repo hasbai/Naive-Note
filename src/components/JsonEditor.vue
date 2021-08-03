@@ -48,6 +48,7 @@ export default {
     saveConfig() {
       localStorage.setItem('vuex', JSON.stringify(this.editor.get()))
       this.message.success('设置成功')
+      location.reload()
     },
     createEditor() {
       const container = this.$refs.jsonEditor
