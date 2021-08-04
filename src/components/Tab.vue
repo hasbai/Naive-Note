@@ -8,7 +8,7 @@
       tab-style="min-width: 80px"
     >
       <n-tab-pane
-        v-for="file in files"
+        v-for="file in tabs"
         :key="file.key"
         :tab="unsavedFiles.includes(file.key) ? '● ' + file.label : file.label"
         :name="file.key"
@@ -35,7 +35,6 @@ export default {
   components: { Editor },
   data() {
     return {
-      files: [], // Array<File> File: {name: file.label, key: file.key}
       cachedEditors: [], // 所有已渲染的编辑器
       viewingKey: '', // file.key
     }
@@ -44,29 +43,33 @@ export default {
     unsavedFiles() {
       return this.$store.state.unsavedFiles
     },
+    tabs() {
+      // Array<File> File: {name: file.label, key: file.key}
+      return this.$store.state.tabs
+    },
   },
   methods: {
     findIndex(key) {
       // 对象数组不能用 includes 判断
-      return this.files.findIndex((file) => key === file.key)
+      return this.tabs.findIndex((file) => key === file.key)
     },
     close(key) {
       const index = this.findIndex(key)
-      if (this.files.length === 1) {
+      if (this.tabs.length === 1) {
         this.viewingKey = ''
-      } else if (index === this.files.length - 1) {
-        this.viewingKey = this.files[index - 1].key
+      } else if (index === this.tabs.length - 1) {
+        this.viewingKey = this.tabs[index - 1].key
       } else {
-        this.viewingKey = this.files[index + 1].key
+        this.viewingKey = this.tabs[index + 1].key
       }
-      this.files.splice(index, 1)
+      this.$store.commit('deleteTab', index)
     },
     add(node) {
       const isOpened = this.findIndex(node.key) >= 0
       const isCached = this.cachedEditors.includes(node.key)
       // 打开标签页
       if (!isOpened) {
-        this.files.push(node)
+        this.$store.commit('addTab', node)
       }
       // 缓存编辑器
       if (!isCached) {

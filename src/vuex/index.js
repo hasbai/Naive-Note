@@ -16,6 +16,7 @@ const store = createStore({
       webdavConfig: {},
       folders: [],
       unsavedFiles: [],
+      tabs: [], // 打开的标签
       showWebdavConfig: false,
       showFolderSelector: false,
       showJsonEditor: false,
@@ -65,6 +66,14 @@ const store = createStore({
     },
     setFolders(state, folders) {
       state.folders = folders
+    },
+    addTab(state, node) {
+      state.tabs.push(node)
+    },
+    deleteTab(state, index) {
+      if (index >= 0) {
+        state.tabs.splice(index, 1)
+      }
     },
     modifyUnsavedFiles(state, payload) {
       const key = payload.key
