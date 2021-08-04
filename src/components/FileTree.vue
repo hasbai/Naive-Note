@@ -223,7 +223,7 @@ export default {
       // 创建文件
       this.buttonLoading = true
       try {
-        const result = await this.client.putFileContents(filePath, '', {
+        await this.client.putFileContents(filePath, '', {
           contentLength: false,
         })
         this.message.success('创建文件成功')
