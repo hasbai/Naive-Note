@@ -17,6 +17,7 @@ const store = createStore({
       folders: [],
       unsavedFiles: [],
       tabs: [], // 打开的标签
+      viewingKey: '', // 位于前台的编辑器（node.key）
       showWebdavConfig: false,
       showFolderSelector: false,
       showJsonEditor: false,
@@ -70,10 +71,23 @@ const store = createStore({
     addTab(state, node) {
       state.tabs.push(node)
     },
-    deleteTab(state, index) {
+    closeTab(state, key) {
+      const index = state.tabs.findIndex((node) => key === node.key)
+      // 关闭标签
       if (index >= 0) {
         state.tabs.splice(index, 1)
       }
+      // 设置 viewingKey
+      if (state.tabs.length === 1) {
+        state.viewingKey = ''
+      } else if (index === state.tabs.length - 1) {
+        state.viewingKey = state.tabs[index - 1].key
+      } else {
+        state.viewingKey = state.tabs[index + 1].key
+      }
+    },
+    setViewingKey(state, key) {
+      state.viewingKey = key
     },
     modifyUnsavedFiles(state, payload) {
       const key = payload.key

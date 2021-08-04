@@ -36,7 +36,6 @@ export default {
   data() {
     return {
       cachedEditors: [], // 所有已渲染的编辑器
-      viewingKey: '', // file.key
     }
   },
   computed: {
@@ -47,6 +46,9 @@ export default {
       // Array<File> File: {name: file.label, key: file.key}
       return this.$store.state.tabs
     },
+    viewingKey() {
+      return this.$store.state.viewingKey
+    },
   },
   methods: {
     findIndex(key) {
@@ -54,15 +56,7 @@ export default {
       return this.tabs.findIndex((file) => key === file.key)
     },
     close(key) {
-      const index = this.findIndex(key)
-      if (this.tabs.length === 1) {
-        this.viewingKey = ''
-      } else if (index === this.tabs.length - 1) {
-        this.viewingKey = this.tabs[index - 1].key
-      } else {
-        this.viewingKey = this.tabs[index + 1].key
-      }
-      this.$store.commit('deleteTab', index)
+      this.$store.commit('closeTab', key)
     },
     add(node) {
       const isOpened = this.findIndex(node.key) >= 0
@@ -76,7 +70,7 @@ export default {
         this.cachedEditors.push(node.key)
       }
       // 切换至（如没有则创建）编辑器
-      this.viewingKey = node.key
+      this.$store.commit('setViewingKey', node.key)
       // 如果编辑器已缓存且标签页已打开，再次点击则更新内容
       if (isOpened && isCached) {
         this.$nextTick(() => {
