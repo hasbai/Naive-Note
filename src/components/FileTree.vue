@@ -52,7 +52,7 @@ import {
   FileOutlined,
   FileTextOutlined,
   FileAddOutlined,
-  DeleteFilled,
+  DeleteOutlined,
 } from '@vicons/antd'
 export default {
   name: 'FileTree',
@@ -106,7 +106,7 @@ export default {
               text: true,
               onClick: () => this.prepareDeleteFile(node),
             },
-            { default: () => this.renderIcon(DeleteFilled) }
+            { default: () => this.renderIcon(DeleteOutlined) }
           )
       }
     },
@@ -226,9 +226,6 @@ export default {
         const result = await this.client.putFileContents(filePath, '', {
           contentLength: false,
         })
-        if (result === false) {
-          throw '文件未写入'
-        }
         this.message.success('创建文件成功')
         // 关闭对话框
         this.showFileCreate = false

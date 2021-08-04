@@ -10,7 +10,7 @@
       <n-h2 class="item">Naive Note</n-h2>
       <div class="container item">
         <n-button class="button" text @click="displayJsonEditor">
-          <n-icon size="20px">
+          <n-icon id="setting-icon">
             <setting-outlined />
           </n-icon>
         </n-button>
@@ -169,5 +169,9 @@ export default {
 }
 .button {
   margin-left: auto;
+}
+#setting-icon {
+  height: 24px;
+  width: 24px;
 }
 </style>
