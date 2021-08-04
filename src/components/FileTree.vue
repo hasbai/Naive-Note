@@ -44,7 +44,7 @@
 <!--suppress JSUnusedGlobalSymbols -->
 <script>
 import { h, toRaw } from 'vue'
-import { NIcon, NButton, useMessage } from 'naive-ui'
+import { NIcon, NButton, useMessage, useDialog, useLoadingBar } from 'naive-ui'
 import { LogoMarkdown } from '@vicons/ionicons5'
 import {
   FilePdfOutlined,
@@ -52,6 +52,7 @@ import {
   FileOutlined,
   FileTextOutlined,
   FileAddOutlined,
+  DeleteFilled,
 } from '@vicons/antd'
 export default {
   name: 'FileTree',
@@ -68,6 +69,8 @@ export default {
       data: [],
       selectedKeys: [],
       message: useMessage(),
+      dialog: useDialog(),
+      loadingBar: useLoadingBar(),
       showFileCreate: false,
       buttonLoading: false,
       createFileName: '',
@@ -84,12 +87,38 @@ export default {
       // 渲染图标, 插槽使用函数表达以提高性能
       return h(NIcon, {}, { default: () => h(iconComponent) })
     },
+    renderSuffix(node) {
+      if (node.isLeaf === false) {
+        node.suffix = () =>
+          h(
+            NButton,
+            {
+              text: true,
+              onClick: () => this.prepareCreateFile(node),
+            },
+            { default: () => this.renderIcon(FileAddOutlined) }
+          )
+      } else if (node.isLeaf === true) {
+        node.suffix = () =>
+          h(
+            NButton,
+            {
+              text: true,
+              onClick: () => this.prepareDeleteFile(node),
+            },
+            { default: () => this.renderIcon(DeleteFilled) }
+          )
+      }
+    },
     async handleLoad(node) {
       let items
+      this.loadingBar.start()
       try {
         items = await this.client.getDirectoryContents(node.key)
+        this.loadingBar.finish()
       } catch (e) {
         console.log(e)
+        this.loadingBar.error()
         this.error('文件加载失败')
       }
       node.children = items.map((item) => {
@@ -105,12 +134,14 @@ export default {
         } else {
           icon = FileOutlined
         }
-        return {
+        const node = {
           label: item.basename,
           key: item.filename,
           isLeaf: item.type !== 'directory',
           prefix: () => this.renderIcon(icon),
         }
+        this.renderSuffix(node)
+        return node
       })
       return node
     },
@@ -130,7 +161,33 @@ export default {
           }
         }
       }
-      return undefined
+    },
+    findParent(node, key) {
+      if (
+        node.isLeaf ||
+        !(node.children instanceof Array) ||
+        node.children.length === 0
+      ) {
+        return
+      }
+
+      for (let i = 0; i < node.children.length; i++) {
+        if (node.children[i].key === key) {
+          return node
+        }
+        const result = this.findParent(node.children[i], key)
+        if (result) {
+          return result
+        }
+      }
+    },
+    findParentInArray(array, key) {
+      for (let i = 0; i < array.length; i++) {
+        const result = this.findParent(array[i], key)
+        if (result) {
+          return result
+        }
+      }
     },
     handleSelectedKeys(keys) {
       this.selectedKeys = keys
@@ -187,20 +244,44 @@ export default {
         this.buttonLoading = false
       }
     },
+    prepareDeleteFile(node) {
+      this.dialog.warning({
+        title: '删除文件',
+        content: '确定删除文件？',
+        positiveText: '删！',
+        negativeText: '算了',
+        onPositiveClick: () => {
+          this.deleteFile(node)
+        },
+        onNegativeClick: () => {
+          // pass
+        },
+      })
+    },
+    async deleteFile(node) {
+      this.loadingBar.start()
+      try {
+        await this.client.deleteFile(node.key)
+        this.loadingBar.finish()
+        this.message.success('删除成功')
+        // 关闭标签
+        this.$store.commit('closeTab', node.key)
+        // 更新文件树
+        const parent = this.findParentInArray(this.data, node.key)
+        const index = parent.children.findIndex(
+          (_node) => node.key === _node.key
+        )
+        parent.children.splice(index, 1)
+      } catch (e) {
+        console.log(e)
+        this.loadingBar.error()
+        this.message.error('删除失败')
+      }
+    },
     processInputData() {
       this.data = this.inputData
       this.data.forEach((node) => {
-        if (node.isLeaf === false) {
-          node.suffix = () =>
-            h(
-              NButton,
-              {
-                text: true,
-                onClick: () => this.prepareCreateFile(node),
-              },
-              { default: () => this.renderIcon(FileAddOutlined) }
-            )
-        }
+        this.renderSuffix(node)
       })
     },
   },
