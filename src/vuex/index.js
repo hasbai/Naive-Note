@@ -73,10 +73,6 @@ const store = createStore({
     },
     closeTab(state, key) {
       const index = state.tabs.findIndex((node) => key === node.key)
-      // 关闭标签
-      if (index >= 0) {
-        state.tabs.splice(index, 1)
-      }
       // 设置 viewingKey
       if (state.tabs.length === 1) {
         state.viewingKey = ''
@@ -84,6 +80,10 @@ const store = createStore({
         state.viewingKey = state.tabs[index - 1].key
       } else {
         state.viewingKey = state.tabs[index + 1].key
+      }
+      // 关闭标签
+      if (index >= 0) {
+        state.tabs.splice(index, 1)
       }
     },
     setViewingKey(state, key) {
