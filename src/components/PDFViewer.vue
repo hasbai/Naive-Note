@@ -90,8 +90,6 @@ export default {
       this.numPages = pdfDocument.numPages
       // 开始观察
       this.$refs.beforeTop.scrollIntoView()
-
-      // await new Promise((r) => setTimeout(r, 100))
       this.topObserver.observe(this.$refs.top)
       this.bottomObserver.observe(this.$refs.bottom)
     },
@@ -119,13 +117,11 @@ export default {
       }
     },
   },
+  activated() {
+    this.$refs.beforeTop.scrollIntoView()
+  },
   created() {
     this.loadData()
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.$refs.top.focus()
-    })
   },
 }
 </script>
