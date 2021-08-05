@@ -32,4 +32,13 @@
 .vditor-toolbar .vditor-tooltipped {
   position: static;
 }
+.pdf-toolbar .n-input__input-el {
+  height: auto;
+  line-height: normal;
+}
+.pdf-toolbar .n-input-wrapper {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  text-align: center;
+}
 </style>
