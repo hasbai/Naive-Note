@@ -1,7 +1,7 @@
 <template>
   <div class="tab-container">
     <n-tabs
-      v-model:value="viewingKey"
+      v-model:value="localViewingKey"
       type="card"
       closable
       @close="close"
@@ -17,25 +17,38 @@
       </n-tab-pane>
     </n-tabs>
     <keep-alive>
-      <Editor
+      <component
         v-if="viewingKey"
+        :is="componentName"
         :key="viewingKey"
         :path="viewingKey"
-        ref="editor"
-      ></Editor>
+        ref="tab"
+      ></component>
     </keep-alive>
+
+    <!--      <Editor-->
+    <!--        v-if="viewingKey"-->
+    <!--        :key="viewingKey"-->
+    <!--        :path="viewingKey"-->
+    <!--        ref="editor"-->
+    <!--      ></Editor>-->
   </div>
 </template>
 
 <script>
+import { shallowRef } from 'vue'
 import { useMessage } from 'naive-ui'
 import Editor from '@/components/Editor.vue'
+import PDFViewer from '@/components/PDFViewer.vue'
 export default {
   name: 'Tab',
   components: { Editor },
   data() {
     return {
       cachedEditors: [], // 所有已渲染的编辑器
+      componentName: '',
+      componentProps: {},
+      localViewingKey: '',
     }
   },
   computed: {
@@ -48,6 +61,14 @@ export default {
     },
     viewingKey() {
       return this.$store.state.viewingKey
+    },
+  },
+  watch: {
+    viewingKey() {
+      this.localViewingKey = this.viewingKey
+    },
+    localViewingKey() {
+      this.$store.commit('setViewingKey', this.localViewingKey)
     },
   },
   methods: {
@@ -70,11 +91,18 @@ export default {
         this.cachedEditors.push(node.key)
       }
       // 切换至（如没有则创建）编辑器
+      if (node.mime === 'text/markdown') {
+        this.componentName = shallowRef(Editor)
+      } else if (node.mime === 'application/pdf') {
+        this.componentName = shallowRef(PDFViewer)
+      } else {
+        return
+      }
       this.$store.commit('setViewingKey', node.key)
-      // 如果编辑器已缓存且标签页已打开，再次点击则更新内容
-      if (isOpened && isCached) {
+      // 如果 markdown 编辑器已缓存且标签页已打开，再次点击则更新内容
+      if (isOpened && isCached && node.mime === 'text/markdown') {
         this.$nextTick(() => {
-          this.$refs.editor.onUpdate()
+          this.$refs.tab.onUpdate()
         })
       }
     },
