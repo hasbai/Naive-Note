@@ -1,31 +1,12 @@
 <template>
   <div>
-    <n-modal
-      :show="showFileCreate"
-      preset="card"
-      style="width: 50%; max-width: 400px"
-      title="创建文件"
-      :bordered="false"
-      size="medium"
-      closable
-      @close="this.showFileCreate = false"
-    >
-      <n-input
-        v-model:value="createFileName"
-        type="text"
-        placeholder="叫什么？"
-      />
-      <div style="display: flex; justify-content: flex-end; margin-top: 12px">
-        <n-button
-          @click="createFile"
-          type="primary"
-          size="small"
-          :loading="buttonLoading"
-        >
-          确认
-        </n-button>
-      </div>
-    </n-modal>
+    <CreateSomething
+      :show="showCreateSomething"
+      :mode="createMode"
+      :create-file-parent="createFileParent"
+      @close="createClose"
+      @success="createSuccess"
+    ></CreateSomething>
     <n-tree
       block-line
       :data="data"
@@ -54,9 +35,10 @@ import {
   FileAddOutlined,
   DeleteOutlined,
 } from '@vicons/antd'
+import CreateSomething from '@/components/CreateSomething.vue'
 export default {
   name: 'FileTree',
-  components: {},
+  components: { CreateSomething },
   props: {
     inputData: Array, // Array<TreeNode>
     multiple: {
@@ -71,10 +53,9 @@ export default {
       message: useMessage(),
       dialog: useDialog(),
       loadingBar: useLoadingBar(),
-      showFileCreate: false,
-      buttonLoading: false,
-      createFileName: '',
-      createFileDir: null,
+      showCreateSomething: false,
+      createFileParent: null,
+      createMode: 'file',
     }
   },
   computed: {
@@ -100,7 +81,7 @@ export default {
     render(node) {
       if (node.isLeaf === false) {
         node.suffix = () =>
-          this.renderButton(this.prepareCreateFile, node, FileAddOutlined)
+          this.renderButton(this.createFile, node, FileAddOutlined)
         node.prefix = () =>
           this.renderButton(this.createFolder, node, FolderOpenFilled)
       } else if (node.isLeaf === true) {
@@ -133,7 +114,7 @@ export default {
       } catch (e) {
         console.log(e)
         this.loadingBar.error()
-        this.error('文件加载失败')
+        this.message.error('文件加载失败')
       }
       // 生成子节点
       node.children = items.map((item) => {
@@ -207,41 +188,10 @@ export default {
       // 返回 Array<树节点的 key>
       this.$emit('on-expand', keys)
     },
-    prepareCreateFile(node) {
-      this.showFileCreate = true
-      this.createFileDir = node
-    },
-    async createFile() {
-      // 校验文件名非空
-      this.createFileName = this.createFileName.trim()
-      if (this.createFileName === '') {
-        this.message.error('文件名不能为空')
-        return false
-      }
-      // 构造文件路径
-      const parentPath =
-        this.createFileDir.key === '/' ? '' : this.createFileDir.key // 根目录为 '/'，其它目录末尾无 '/'
-      const filePath = parentPath + '/' + this.createFileName
-      // 创建文件
-      this.buttonLoading = true
-      try {
-        await this.client.putFileContents(filePath, '', {
-          contentLength: false,
-        })
-        this.message.success('创建文件成功')
-        // 关闭对话框
-        this.showFileCreate = false
-        // 刷新文件夹数据
-        await this.handleLoad(this.createFileDir)
-        // 重置表单数据
-        this.createFileDir = null
-        this.createFileName = ''
-      } catch (e) {
-        console.log(e)
-        this.message.error('创建文件失败')
-      } finally {
-        this.buttonLoading = false
-      }
+    createFile(node) {
+      this.showCreateSomething = true
+      this.createFileParent = node
+      this.createMode = 'file'
     },
     prepareDeleteFile(node) {
       this.dialog.warning({
@@ -279,6 +229,16 @@ export default {
     },
     createFolder(node) {
       console.log(node)
+    },
+    createClose() {
+      this.showCreateSomething = false
+    },
+    async createSuccess() {
+      this.createClose()
+      // 刷新文件夹数据
+      await this.handleLoad(this.createFileParent)
+      // 重置父节点
+      // this.createFileParent = null
     },
     processInputData() {
       this.data = this.inputData
