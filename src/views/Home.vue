@@ -33,7 +33,7 @@
       <n-layout-content
         content-style="padding: 0; text-align: left; height: 100%"
       >
-        <Tab ref="tab"></Tab>
+        <Tab ref="tabs"></Tab>
       </n-layout-content>
     </n-layout>
 
@@ -92,7 +92,7 @@ export default {
       }
       // 添加文件
       nodes.forEach((node) => {
-        this.$refs.tab.add(node)
+        this.$refs.tabs.add(node)
       })
     },
   },
