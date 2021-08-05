@@ -99,7 +99,7 @@ export default {
 
   computed: {
     folders() {
-      return this.$store.getters.folders
+      return this.$store.state.folders
     },
     showWebdavConfig() {
       return this.$store.state.showWebdavConfig

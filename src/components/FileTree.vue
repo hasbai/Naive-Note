@@ -83,34 +83,48 @@ export default {
     },
   },
   methods: {
-    renderIcon(iconComponent) {
+    renderIcon(icon) {
       // 渲染图标, 插槽使用函数表达以提高性能
-      return h(NIcon, {}, { default: () => h(iconComponent) })
+      return h(NIcon, {}, { default: () => h(icon) })
     },
-    renderSuffix(node) {
+    renderButton(callback, node, icon) {
+      return h(
+        NButton,
+        {
+          text: true,
+          onClick: () => callback(node),
+        },
+        { default: () => this.renderIcon(icon) }
+      )
+    },
+    render(node) {
       if (node.isLeaf === false) {
         node.suffix = () =>
-          h(
-            NButton,
-            {
-              text: true,
-              onClick: () => this.prepareCreateFile(node),
-            },
-            { default: () => this.renderIcon(FileAddOutlined) }
-          )
+          this.renderButton(this.prepareCreateFile, node, FileAddOutlined)
+        node.prefix = () =>
+          this.renderButton(this.createFolder, node, FolderOpenFilled)
       } else if (node.isLeaf === true) {
         node.suffix = () =>
-          h(
-            NButton,
-            {
-              text: true,
-              onClick: () => this.prepareDeleteFile(node),
-            },
-            { default: () => this.renderIcon(DeleteOutlined) }
-          )
+          this.renderButton(this.prepareDeleteFile, node, DeleteOutlined)
+        if (!node.mime) {
+          return
+        }
+        let icon
+        if (node.mime.includes('markdown')) {
+          icon = LogoMarkdown
+        } else if (node.mime.includes('pdf')) {
+          icon = FilePdfOutlined
+        } else if (node.mime.includes('text')) {
+          icon = FileTextOutlined
+        } else {
+          icon = FileOutlined
+        }
+        node.prefix = () => this.renderIcon(icon)
       }
+      return node
     },
     async handleLoad(node) {
+      // 加载
       let items
       this.loadingBar.start()
       try {
@@ -121,28 +135,15 @@ export default {
         this.loadingBar.error()
         this.error('文件加载失败')
       }
+      // 生成子节点
       node.children = items.map((item) => {
-        let icon
-        if (item.type === 'directory') {
-          icon = FolderOpenFilled
-        } else if (item.mime.includes('markdown')) {
-          icon = LogoMarkdown
-        } else if (item.mime.includes('pdf')) {
-          icon = FilePdfOutlined
-        } else if (item.mime.includes('text')) {
-          icon = FileTextOutlined
-        } else {
-          icon = FileOutlined
-        }
-        const node = {
+        let node = {
           label: item.basename,
           key: item.filename,
           isLeaf: item.type !== 'directory',
           mime: item.mime,
-          prefix: () => this.renderIcon(icon),
         }
-        this.renderSuffix(node)
-        return node
+        return this.render(node)
       })
       return node
     },
@@ -276,10 +277,13 @@ export default {
         this.message.error('删除失败')
       }
     },
+    createFolder(node) {
+      console.log(node)
+    },
     processInputData() {
       this.data = this.inputData
       this.data.forEach((node) => {
-        this.renderSuffix(node)
+        this.render(node)
       })
     },
   },
