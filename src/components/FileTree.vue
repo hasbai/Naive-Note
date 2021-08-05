@@ -138,6 +138,7 @@ export default {
           label: item.basename,
           key: item.filename,
           isLeaf: item.type !== 'directory',
+          mime: item.mime,
           prefix: () => this.renderIcon(icon),
         }
         this.renderSuffix(node)
