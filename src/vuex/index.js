@@ -29,10 +29,7 @@ const store = createStore({
       })
     },
     folders(state) {
-      state.folders.forEach((folder) => {
-        delete folder.children
-      })
-      return state.folders
+      return JSON.parse(JSON.stringify(state.folders)) // 深拷贝，防止污染配置项
     },
   },
   mutations: {
