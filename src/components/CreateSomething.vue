@@ -4,9 +4,7 @@
     preset="card"
     size="medium"
     style="width: 50%; max-width: 400px"
-    closable
-    @close="close"
-    title="title"
+    :title="title"
     :bordered="false"
   >
     <n-input
@@ -42,7 +40,6 @@ export default {
     return {
       value: '',
       buttonLoading: false,
-      title: this.mode === 'file' ? '创建文件' : '创建文件夹',
       message: useMessage(),
     }
   },
@@ -50,42 +47,45 @@ export default {
     client() {
       return this.$store.getters.client
     },
+    title() {
+      return this.mode === 'file' ? '创建文件' : '创建文件夹'
+    },
+  },
+  watch: {
+    mode() {},
   },
   methods: {
-    submit() {
-      const mode = this.mode === 'file' ? '创建文件' : '创建文件夹'
+    async submit() {
+      // 校验文件名非空
+      this.value = this.value.trim()
+      if (this.value === '') {
+        this.message.error('内容不能为空')
+        return false
+      }
+      // 构造路径
+      const parentPath =
+        this.createFileParent.key === '/' ? '' : this.createFileParent.key // 根目录为 '/'，其它目录末尾无 '/'
+      const path = parentPath + '/' + this.value
+      // 发送请求
       this.buttonLoading = true
       try {
         if (this.mode === 'file') {
-          this.createFile()
+          // 创建文件
+          await this.client.putFileContents(path, '', {
+            contentLength: false,
+          })
+        } else {
+          await this.client.createDirectory(path)
         }
-        this.message.success(mode + '成功')
+        this.message.success(this.title + '成功')
         this.$emit('success')
         this.value = ''
       } catch (e) {
         console.log(e)
-        this.message.error(mode + '失败')
+        this.message.error(this.title + '失败')
       } finally {
         this.buttonLoading = false
       }
-    },
-    async createFile() {
-      // 校验文件名非空
-      this.value = this.value.trim()
-      if (this.value === '') {
-        this.message.error('文件名不能为空')
-        return false
-      }
-      // 构造文件路径
-      const parentPath =
-        this.createFileParent.key === '/' ? '' : this.createFileParent.key // 根目录为 '/'，其它目录末尾无 '/'
-      const filePath = parentPath + '/' + this.value
-      // 创建文件
-
-      await this.client.putFileContents(filePath, '', {
-        contentLength: false,
-      })
-      this.$emit('success')
     },
     close() {
       this.$emit('close')

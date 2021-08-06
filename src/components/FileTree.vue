@@ -228,7 +228,9 @@ export default {
       }
     },
     createFolder(node) {
-      console.log(node)
+      this.showCreateSomething = true
+      this.createFileParent = node
+      this.createMode = 'folder'
     },
     createClose() {
       this.showCreateSomething = false
@@ -237,7 +239,7 @@ export default {
       this.createClose()
       // 刷新文件夹数据
       await this.handleLoad(this.createFileParent)
-      // 重置父节点
+      // 不用重置父节点
       // this.createFileParent = null
     },
     processInputData() {
