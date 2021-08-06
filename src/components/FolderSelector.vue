@@ -35,6 +35,7 @@ export default {
   data() {
     return {
       selectedNodes: [], // Array<树结点>
+      message: useMessage(),
     }
   },
   methods: {
@@ -70,9 +71,6 @@ export default {
     showFolderSelector() {
       return this.$store.state.showFolderSelector
     },
-  },
-  created() {
-    this.message = useMessage()
   },
 }
 </script>

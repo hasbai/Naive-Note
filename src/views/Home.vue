@@ -67,7 +67,9 @@ export default {
   },
 
   data() {
-    return {}
+    return {
+      message: useMessage(),
+    }
   },
 
   methods: {
@@ -114,7 +116,6 @@ export default {
 
   created() {
     const that = this
-    this.message = useMessage()
     // 设置 webdav
     async function configWebdav() {
       if (Object.keys(that.$store.state.webdavConfig).length > 0) {

@@ -27,6 +27,7 @@ export default {
     return {
       json: {},
       editor: undefined,
+      message: useMessage(),
     }
   },
   computed: {
@@ -56,10 +57,6 @@ export default {
       this.editor = new JSONEditor(container, options)
       this.editor.set(JSON.parse(localStorage.getItem('vuex')))
     },
-  },
-  mounted() {},
-  created() {
-    this.message = useMessage()
   },
 }
 </script>

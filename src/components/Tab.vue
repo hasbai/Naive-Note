@@ -42,6 +42,7 @@ export default {
     return {
       cachedEditors: [], // 所有已渲染的编辑器
       componentName: '',
+      message: useMessage(),
     }
   },
   computed: {
@@ -107,9 +108,6 @@ export default {
         })
       }
     },
-  },
-  created() {
-    this.message = useMessage()
   },
 }
 </script>

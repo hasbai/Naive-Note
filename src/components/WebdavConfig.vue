@@ -52,23 +52,6 @@ import { useMessage } from 'naive-ui'
 import { createClient } from 'webdav'
 export default {
   name: 'WebdavConfig',
-  components: {},
-  setup() {
-    const message = useMessage()
-    return {
-      successInfo() {
-        message.success('连接成功！', { duration: 3000 })
-        return true
-      },
-      errorInfo() {
-        message.error(
-          '用户名或密码错误或跨域问题, 请检查 devtools 以获取详细信息',
-          { duration: 3000 }
-        )
-        return false
-      },
-    }
-  },
   data() {
     return {
       buttonLoading: false,
@@ -77,6 +60,7 @@ export default {
         username: '',
         password: '',
       },
+      message: useMessage(),
     }
   },
   computed: {
@@ -95,18 +79,20 @@ export default {
         await client.stat('/', {
           details: true,
         })
-        this.successInfo()
+        this.message.success('连接成功！', { duration: 3000 })
         this.$store.commit('closeConfigDialogue', 'showWebdavConfig')
         this.$store.commit('setWebdavConfig', this.model)
       } catch (e) {
         console.log(e)
-        this.errorInfo()
+        this.message.error(
+          '用户名或密码错误或跨域问题, 请检查 devtools 以获取详细信息',
+          { duration: 5000 }
+        )
       } finally {
         this.buttonLoading = false
       }
     },
   },
-  created() {},
 }
 </script>
 
