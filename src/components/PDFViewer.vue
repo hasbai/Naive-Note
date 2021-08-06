@@ -78,7 +78,7 @@ export default {
     },
   },
   methods: {
-    async loadData() {
+    async update() {
       // 加载数据
       this.loadingBar.start()
       const arrayBuffer = await this.client.getFileContents(this.path)
@@ -88,6 +88,9 @@ export default {
       // 获取页数
       const pdfDocument = await this.src.promise
       this.numPages = pdfDocument.numPages
+    },
+    async create() {
+      await this.update()
       // 开始观察
       this.$refs.beforeTop.scrollIntoView()
       this.topObserver.observe(this.$refs.top)
@@ -121,7 +124,7 @@ export default {
     this.$refs.beforeTop.scrollIntoView()
   },
   created() {
-    this.loadData()
+    this.create()
   },
 }
 </script>

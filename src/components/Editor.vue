@@ -54,7 +54,7 @@ export default {
     },
   },
   methods: {
-    onUpdate() {
+    update() {
       if (this.unsaved) {
         this.dialog.warning({
           title: '更改未保存',
@@ -176,7 +176,7 @@ export default {
     })
   },
   created() {
-    this.onUpdate()
+    this.update()
     setInterval(() => {
       // 加载完后再判断
       if (this.remoteContent !== undefined) {

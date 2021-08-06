@@ -11,6 +11,11 @@
 <script>
 export default {
   name: 'Welcome',
+  methods: {
+    update() {
+      // pass
+    },
+  },
 }
 </script>
 

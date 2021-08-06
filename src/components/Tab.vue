@@ -101,10 +101,10 @@ export default {
       }
       // 切换至（如没有则创建）编辑器
       this.$store.commit('setViewingKey', node.key)
-      // 如果 markdown 编辑器已缓存且标签页已打开，再次点击则更新内容
-      if (isOpened && isCached && node.mime === 'text/markdown') {
+      // 如果编辑器已缓存且标签页已打开，再次点击则更新内容
+      if (isOpened && isCached) {
         this.$nextTick(() => {
-          this.$refs.tab.onUpdate()
+          this.$refs.tab.update()
         })
       }
     },
