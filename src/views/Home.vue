@@ -96,10 +96,9 @@ export default {
       })
     },
   },
-
   computed: {
     folders() {
-      return this.$store.state.folders
+      return this.$store.getters.folders
     },
     showWebdavConfig() {
       return this.$store.state.showWebdavConfig

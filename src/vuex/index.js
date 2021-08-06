@@ -28,6 +28,12 @@ const store = createStore({
         password: webdavConfig.password,
       })
     },
+    folders(state) {
+      state.folders.forEach((folder) => {
+        delete folder.children
+      })
+      return state.folders
+    },
   },
   mutations: {
     displayConfigDialogue(state, name) {
