@@ -73,7 +73,10 @@ export default {
         NButton,
         {
           text: true,
-          onClick: () => callback(node),
+          onClick: (event) => {
+            event.stopPropagation()
+            callback(node)
+          },
         },
         { default: () => this.renderIcon(icon) }
       )
