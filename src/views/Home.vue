@@ -22,10 +22,12 @@
       <!-- 侧边栏 -->
       <n-layout-sider
         bordered
-        collapsed-width="0"
+        :collapsed="sidebarCollapsed"
+        :collapsed-width="collapsedWidth"
         :show-collapsed-content="false"
         show-trigger
-        content-style="padding: 16px 24px;"
+        @update:collapsed="setCollapsed"
+        content-style="padding: 16px 20px; min-width: 0"
       >
         <n-button style="width: 100%" @click="displayFolderSelector">
           <n-icon style="padding-right: 0.5rem">
@@ -74,11 +76,29 @@ export default {
 
   data() {
     return {
+      sidebarCollapsed: false,
+      collapsedWidth: 0,
       message: useMessage(),
     }
   },
-
+  computed: {
+    folders() {
+      return this.$store.getters.folders
+    },
+    showWebdavConfig() {
+      return this.$store.state.showWebdavConfig
+    },
+    showFolderSelector() {
+      return this.$store.state.showFolderSelector
+    },
+    showJsonEditor() {
+      return this.$store.state.showJsonEditor
+    },
+  },
   methods: {
+    setCollapsed(collapsed) {
+      this.sidebarCollapsed = collapsed
+    },
     displayJsonEditor() {
       this.$store.commit('displayConfigDialogue', 'showJsonEditor')
     },
@@ -104,23 +124,12 @@ export default {
       })
     },
   },
-  computed: {
-    folders() {
-      return this.$store.getters.folders
-    },
-    showWebdavConfig() {
-      return this.$store.state.showWebdavConfig
-    },
-    showFolderSelector() {
-      return this.$store.state.showFolderSelector
-    },
-    showJsonEditor() {
-      return this.$store.state.showJsonEditor
-    },
-  },
-  watch: {},
 
   created() {
+    const mql = matchMedia('(max-width: 720px)')
+    mql.addEventListener('change', (e) => {
+      this.sidebarCollapsed = e.matches
+    })
     const that = this
     // 设置 webdav
     async function configWebdav() {
