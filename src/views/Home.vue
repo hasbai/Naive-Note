@@ -127,6 +127,7 @@ export default {
 
   created() {
     const mql = matchMedia('(max-width: 720px)')
+    // this.sidebarCollapsed = mql.matches 侧栏默认打开
     mql.addEventListener('change', (e) => {
       this.sidebarCollapsed = e.matches
     })
