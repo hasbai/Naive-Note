@@ -20,7 +20,13 @@
     <!--主体-->
     <n-layout has-sider position="absolute" style="top: 64px; bottom: 64px">
       <!-- 侧边栏 -->
-      <n-layout-sider bordered content-style="padding: 16px 24px;">
+      <n-layout-sider
+        bordered
+        collapsed-width="0"
+        :show-collapsed-content="false"
+        show-trigger
+        content-style="padding: 16px 24px;"
+      >
         <n-button style="width: 100%" @click="displayFolderSelector">
           <n-icon style="padding-right: 0.5rem">
             <folder-icon />
@@ -122,7 +128,7 @@ export default {
         // that.webdavConfig 默认为 Object
         return 'Webdav 已设置'
       } else {
-        that.$store.commit('displayWebdavConfig')
+        that.$store.commit('displayConfigDialogue', 'showWebdavConfig')
         while (that.showWebdavConfig) {
           await new Promise((r) => setTimeout(r, 100))
         }
@@ -136,7 +142,7 @@ export default {
         // that.folders 默认为 Array
         return '文件夹已打开'
       } else {
-        that.$store.commit('displayFolderSelector')
+        that.$store.commit('displayConfigDialogue', 'showFolderSelector')
         while (that.showFolderSelector) {
           await new Promise((r) => setTimeout(r, 100))
         }
