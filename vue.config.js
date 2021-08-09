@@ -9,4 +9,24 @@ module.exports = {
       },
     },
   },
+  pwa: {
+    name: 'Naive Note',
+    themeColor: '#3175D0',
+    msTileColor: '#3175D0',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black-translucent',
+    workboxPluginMode: 'GenerateSW',
+    workboxOptions: {
+      skipWaiting: true,
+      clientsClaim: true,
+      navigateFallback: '/',
+    },
+    manifestOptions: {
+      short_name: 'Naive Note',
+      lang: 'zh-CN',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#ffffff',
+    },
+  },
 }
