@@ -29,4 +29,11 @@ module.exports = {
       background_color: '#ffffff',
     },
   },
+  // 修改标题
+  chainWebpack: (config) => {
+    config.plugin('html').tap((args) => {
+      args[0].title = 'Naive Note'
+      return args
+    })
+  },
 }
